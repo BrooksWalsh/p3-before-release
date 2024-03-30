@@ -1,0 +1,5 @@
+#ifndef CINCLUDESGLOBALS_H
+#define CINCLUDESGLOBALS_H
+
+
+#endif
