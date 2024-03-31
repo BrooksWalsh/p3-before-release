@@ -14,23 +14,25 @@ int main(int argc, char **argv)
 
     // parse args and update logic manager accordingly
     parseArgs(argc, argv, &LogicManager);
-    if (LogicManager.startPlace) // directory (or cwd when nothing passed)
+    switch (LogicManager.startPlace) // file or dir?
     {
-        if (LogicManager.defaultCWD)
+    case startDir:
+        switch (LogicManager.defaultCWD) // given dir or default?
         {
+        case yesCWD: // no given directory, search cwd
             char *cwd = Getcwd();
             findIncludesInDir(cwd, results, &resultCount);
             free(cwd);
-        }
-        else // given directory to search
-        {
+            break;
+        case noCWD: // given directory to search
             findIncludesInDir(argv[(argc == 2) ? 1 : 2], results, &resultCount);
+            break;
         }
         sortResult(results, &LogicManager, resultCount);
-    }
-    else // header file passed directly
-    {
+        break;
+    case startFile:
         findIncludesInFile(argv[(argc == 2) ? 1 : 2], results, &resultCount);
+        break;
     }
     printResult(results, &LogicManager, resultCount);
     freeResult(results, resultCount);
