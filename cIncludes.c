@@ -5,6 +5,7 @@
 
 int main(int argc, char **argv)
 {
+    // TODO: check for full capacity and realloc (very unlikely but gotta check)
     // initialize results array and logic manager
     int capacity = 128;
     int resultCount = 0;
