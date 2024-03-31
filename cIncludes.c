@@ -1,25 +1,37 @@
+#include <stdlib.h> // for free
 #include "cIncludesGlobals.h"
 #include "cIncludesFuncs.h"
+#include "syscalls.h"
 
 int main(int argc, char **argv)
 {
-    // initialize array for holding FileIncludes structs for each file searched
-    FileIncludes *results[128];
+    // initialize results array and logic manager
+    int capacity = 128;
+    int resultCount = 0;
+    FileIncludes **results = Malloc(capacity * sizeof(FileIncludes *));
+    LogicManager LogicManager = {DictionarySort, NormalOrder, startDir, noCWD};
 
-    // initialize logic manager (two fields: sort type, order mode)
-    LogicManager LogicManager = {DictionarySort, ReversedOrder};
-
-    // parseargs returns truthy if directory and falsy if file
-    if (parseArgs(argc, argv, &LogicManager)) // directory (or cwd when nothing passed)
+    // parse args and update logic manager accordingly
+    parseArgs(argc, argv, &LogicManager);
+    if (LogicManager.startPlace) // directory (or cwd when nothing passed)
     {
-        findIncludesInDir(argv[2], results); // safe b/c parseArgs checks argv[2]
-        sortResult(results, &LogicManager);
-        printResult(results);
+        if (LogicManager.defaultCWD)
+        {
+            char *cwd = Getcwd();
+            findIncludesInDir(cwd, results, &resultCount);
+            free(cwd);
+        }
+        else // given directory to search
+        {
+            findIncludesInDir(argv[(argc == 2) ? 1 : 2], results, &resultCount);
+        }
+        sortResult(results, &LogicManager, resultCount);
     }
     else // header file passed directly
     {
-        findIncludesInFile(argv[2], results); // safe b/c parseArgs checks argv[2]
-        printResult(results);
+        findIncludesInFile(argv[(argc == 2) ? 1 : 2], results, &resultCount);
     }
+    printResult(results, &LogicManager, resultCount);
+    freeResult(results, resultCount);
     return 0;
 }

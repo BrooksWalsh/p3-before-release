@@ -3,9 +3,9 @@ LFLAGS=-g
 
 cIncludes: cIncludes.o cIncludesFuncs.o syscalls.o
 	gcc ${LFLAGS} -o cIncludes cIncludes.o cIncludesFuncs.o syscalls.o
-cIncludes.o: cIncludes.c cIncludesFuncs.h cIncludesGobals.h
+cIncludes.o: cIncludes.c cIncludesFuncs.h cIncludesGlobals.h
 	gcc ${CFLAGS} cIncludes.c
-cIncludesFuncs.o: cIncludesFuncs.c syscalls.h cIncludesGobals.h
+cIncludesFuncs.o: cIncludesFuncs.c syscalls.h cIncludesGlobals.h
 	gcc ${CFLAGS} cIncludesFuncs.c
 syscalls.o: syscalls.c
 	gcc ${CFLAGS} syscalls.c

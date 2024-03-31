@@ -13,15 +13,29 @@ typedef enum
     ReversedOrder = 1
 } OrderType;
 
+typedef enum
+{
+    startFile = 0,
+    startDir = 1
+} StartPlace;
+
+typedef enum
+{
+    noCWD = 0,
+    yesCWD = 1
+} DefaultCWD;
+
 typedef struct
 {
     SortType sortType;
     OrderType orderType;
+    StartPlace startPlace;
+    DefaultCWD defaultCWD;
 } LogicManager;
 
 typedef struct
 {
-    const char *filePath;
+    char *filePath;
     int numIncludes;
 } FileIncludes;
 
