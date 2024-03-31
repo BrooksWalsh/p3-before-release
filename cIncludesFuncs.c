@@ -134,7 +134,6 @@ void parseArgs(int argc, char **argv, LogicManager *LogicManager)
         {
             setOptions(argv[1], LogicManager);
             LogicManager->defaultCWD = yesCWD;
-            return;
         }
         else if (isDirOrHeader(argv[1]))
         {
