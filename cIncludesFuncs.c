@@ -196,7 +196,7 @@ void findIncludesInDir(char *dirPath, FileIncludes **results, int *resultCount, 
     while ((entry = Readdir(dir)) != NULL)
     {
         // skip current directory or parent directory or hidden directory
-        if (entry->d_name[0] == '.' || !strcmp(entry->d_name, ".."))
+        if (entry->d_name[0] == '.' || strcmp(entry->d_name, "..") == 0)
         {
             continue;
         }
@@ -213,9 +213,13 @@ void findIncludesInDir(char *dirPath, FileIncludes **results, int *resultCount, 
 
         // conditional recursive call into subdirectory else process file
         if (S_ISDIR(entryStat.st_mode) && recursive)
+        {
             findIncludesInDir(longPath, results, resultCount, recursive);
+        }
         else if (S_ISREG(entryStat.st_mode))
+        {
             findIncludesInFile(longPath, results, resultCount);
+        }
         free(longPath); // free memory used in temp file/dir path
     }
     Closedir(dir);

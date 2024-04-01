@@ -10,6 +10,7 @@ int main(int argc, char **argv)
     int capacity = 128;
     int resultCount = 0;
     FileIncludes **results = Malloc(capacity * sizeof(FileIncludes *));
+    // LogicManager = {SortType, OrderType, StartPlace, defaultCWD, Recursive}
     LogicManager LogicManager = {DictionarySort, NormalOrder, startDir, false, true};
 
     // parse args and update logic manager accordingly
