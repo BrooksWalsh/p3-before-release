@@ -165,7 +165,7 @@ void findIncludesInFile(char *filePath, FileIncludes **results, int *resultCount
     size_t len = 0;
     while (getline(&line, &len, file) != -1) // read each line of file
     {
-        if (strncmp(line, "#include ", 9) == 0) // check for include statement
+        if (strncmp(line, "#include", 8) == 0) // check for include statement
         {
             results[*resultCount]->numIncludes++; // increment score if found
         }
