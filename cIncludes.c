@@ -10,23 +10,22 @@ int main(int argc, char **argv)
     int capacity = 128;
     int resultCount = 0;
     FileIncludes **results = Malloc(capacity * sizeof(FileIncludes *));
-    LogicManager LogicManager = {DictionarySort, NormalOrder, startDir, noCWD};
+    LogicManager LogicManager = {DictionarySort, NormalOrder, startDir, false, true};
 
     // parse args and update logic manager accordingly
     parseArgs(argc, argv, &LogicManager);
     switch (LogicManager.startPlace) // starting at file or dir?
     {
     case startDir:
-        switch (LogicManager.defaultCWD) // given dir or default to CWD?
+        if (LogicManager.defaultCWD)
         {
-        case yesCWD:
             char *cwd = Getcwd();
-            findIncludesInDir(cwd, results, &resultCount);
+            findIncludesInDir(cwd, results, &resultCount, LogicManager.recursive);
             free(cwd);
-            break;
-        case noCWD:
-            findIncludesInDir(argv[(argc == 2) ? 1 : 2], results, &resultCount);
-            break;
+        }
+        else // directory provided as arg
+        {
+            findIncludesInDir(argv[(argc == 2) ? 1 : 2], results, &resultCount, LogicManager.recursive);
         }
         sortResult(results, &LogicManager, resultCount);
         break;

@@ -49,6 +49,7 @@ int isValidOption(const char *arg)
     // flags to check presence of characters
     int hasDorN = 0;
     int hasR = 0;
+    int hasO = 0;
 
     // check the rest of the string
     for (int i = 1; arg[i] != '\0'; i++)
@@ -66,14 +67,20 @@ int isValidOption(const char *arg)
                 return 0; // second r
             hasR = 1;
         }
+        else if (c == 'o' || c == 'O')
+        {
+            if (hasO)
+                return 0; // second o
+            hasO = 1;
+        }
         else
         {
             return 0; // invalid character found
         }
     }
 
-    // return if either required part is present
-    return hasDorN || hasR;
+    // return if any required part is present
+    return hasDorN || hasR || hasO;
 }
 
 void setOptions(const char *option, LogicManager *LogicManager)
@@ -94,6 +101,10 @@ void setOptions(const char *option, LogicManager *LogicManager)
         case 'R':
             LogicManager->orderType = ReversedOrder;
             break;
+        case 'o':
+        case 'O':
+            LogicManager->recursive = false;
+            break;
         default:
             fprintf(stderr, "Invalid command snuck through error check. Got %s\n", option);
             exit(96);
@@ -103,11 +114,11 @@ void setOptions(const char *option, LogicManager *LogicManager)
 
 void parseArgs(int argc, char **argv, LogicManager *LogicManager)
 {
-    // cIncludes -{d/d, n/N}{r/R} <directory/file.h>
+    // cIncludes -{d/d, n/N}{r/R}{o/O} <directory/file.h>
     // 3 is max, but no min args. default will be -d <cwd>
     if (argc > 3)
     {
-        fprintf(stderr, "Too many arguments, maximum of cIncludes + 2 args (-{d/d, n/N}{r/R} <directory/file.h>). Got %d args.\n", argc - 1);
+        fprintf(stderr, "Too many arguments, maximum of cIncludes + 2 args (-{d/d, n/N}{r/R}{o/O} <directory/file.h>). Got %d args.\n", argc - 1);
         exit(95);
     }
     else if (argc == 3) // mode and path
@@ -124,7 +135,7 @@ void parseArgs(int argc, char **argv, LogicManager *LogicManager)
         }
         else
         {
-            fprintf(stderr, "Invalid mode argument. Required format: -{d/d, n/N}{r/R}. Got %s\n", argv[1]);
+            fprintf(stderr, "Invalid mode argument. Required format: -{d/d, n/N}{r/R}{o/O}. Got %s\n", argv[1]);
             exit(96);
         }
     }
@@ -133,7 +144,7 @@ void parseArgs(int argc, char **argv, LogicManager *LogicManager)
         if (isValidOption(argv[1]))
         {
             setOptions(argv[1], LogicManager);
-            LogicManager->defaultCWD = yesCWD;
+            LogicManager->defaultCWD = true;
         }
         else if (isDirOrHeader(argv[1]))
         {
@@ -150,7 +161,8 @@ void parseArgs(int argc, char **argv, LogicManager *LogicManager)
         LogicManager->sortType = DictionarySort;
         LogicManager->orderType = NormalOrder;
         LogicManager->startPlace = startDir;
-        LogicManager->defaultCWD = yesCWD;
+        LogicManager->defaultCWD = true;
+        LogicManager->recursive = true;
     }
 }
 
@@ -171,11 +183,11 @@ void findIncludesInFile(char *filePath, FileIncludes **results, int *resultCount
         }
     }
     (*resultCount)++; // increment total results
-    free(line);       // free line used in getline
+    free(line);       // free buffer used in getline
     Fclose(file);
 }
 
-void findIncludesInDir(char *dirPath, FileIncludes **results, int *resultCount)
+void findIncludesInDir(char *dirPath, FileIncludes **results, int *resultCount, bool recursive)
 {
     DIR *dir = Opendir(dirPath);
     struct dirent *entry;
@@ -199,9 +211,9 @@ void findIncludesInDir(char *dirPath, FileIncludes **results, int *resultCount)
             continue;
         }
 
-        // recursive call into subdirectory or process file
-        if (S_ISDIR(entryStat.st_mode))
-            findIncludesInDir(longPath, results, resultCount);
+        // conditional recursive call into subdirectory else process file
+        if (S_ISDIR(entryStat.st_mode) && recursive)
+            findIncludesInDir(longPath, results, resultCount, recursive);
         else if (S_ISREG(entryStat.st_mode))
             findIncludesInFile(longPath, results, resultCount);
         free(longPath); // free memory used in temp file/dir path

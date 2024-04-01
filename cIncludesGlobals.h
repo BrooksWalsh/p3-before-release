@@ -1,6 +1,8 @@
 #ifndef CINCLUDESGLOBALS_H
 #define CINCLUDESGLOBALS_H
 
+#include <stdbool.h>
+
 typedef enum
 {
     DictionarySort = 0,
@@ -19,18 +21,13 @@ typedef enum
     startDir = 1
 } StartPlace;
 
-typedef enum
-{
-    noCWD = 0,
-    yesCWD = 1
-} DefaultCWD;
-
 typedef struct
 {
     SortType sortType;
     OrderType orderType;
     StartPlace startPlace;
-    DefaultCWD defaultCWD;
+    bool defaultCWD;
+    bool recursive;
 } LogicManager;
 
 typedef struct
