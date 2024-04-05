@@ -33,10 +33,10 @@ function findIncludesInDir {  # function to perform the appropriate call to recu
     o|'do'|od)                     grep -c  ^#include $dir/*.h               | sort -d         ;;
     dr|rd)                         grep -rc ^#include $dir     | grep "\.h:" | sort -d -r      ;;
     ro|or|odr|ord|dor|rod|dro|rdo) grep -c  ^#include $dir/*.h               | sort -d -r      ;;
-    n)                             grep -rc ^#include $dir     | grep "\.h:" | sort -t: -k2    ;;
-    no|on)                         grep -c  ^#include $dir/*.h               | sort -t: -k2    ;;
-    nr|rn)                         grep -rc ^#include $dir     | grep "\.h:" | sort -t: -k2 -r ;;
-    onr|orn|nor|ron|nro|rno)       grep -c  ^#include $dir/*.h               | sort -t: -k2 -r ;;
+    n)                             grep -rc ^#include $dir     | grep "\.h:" | sort -t: -k2 -n    ;;
+    no|on)                         grep -c  ^#include $dir/*.h               | sort -t: -k2 -n    ;;
+    nr|rn)                         grep -rc ^#include $dir     | grep "\.h:" | sort -t: -k2 -n -r ;;
+    onr|orn|nor|ron|nro|rno)       grep -c  ^#include $dir/*.h               | sort -t: -k2 -n -r ;;
     *)                             echoErr "Invalid option(s) '$options'"; exit 99             ;;
   esac
 }
